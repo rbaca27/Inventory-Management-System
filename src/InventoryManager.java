@@ -5,33 +5,31 @@ public class InventoryManager {
 
     private final HashMap<String, Product> inventory = new HashMap<>();
 
-    public void addProduct(String productName, int quantity){
-        String normalizedStr = normalizeStr(productName);
-        if (inventory.containsKey(normalizedStr)){
-            inventory.get(normalizedStr).updateStock(quantity);
-            System.out.printf("Updated %s inventory by %d; total: %d\n", normalizedStr, quantity,
-                    inventory.get(normalizedStr).getInventoryAmount().get());
-        }else {
-            Product product = new Product(normalizedStr, quantity);
-            Journaler.log("add", productName, quantity);
-            inventory.put(normalizedStr, product);
-            System.out.printf("Added %d %s to inventory.\n", quantity, normalizedStr);
+    private void updateInventory(String action, String productName, int quantity) {
+        String normalized = normalizeStr(productName);
+
+        if (action.equals("add")) {
+            if (inventory.containsKey(normalized)) {
+                inventory.get(normalized).updateStock(quantity, true, action);
+            } else {
+                inventory.put(normalized, new Product(normalized, quantity));
+            }
+        }
+        else if (action.equals("sell")) {
+            if (inventory.containsKey(normalized)) {
+                inventory.get(normalized).updateStock(-quantity, true, action);
+            }
         }
     }
+    public void addProduct(String name, int qty) {
+        Journaler.log("add", name, qty);
+        updateInventory("add", name, qty);
+    }
 
-    public void sellProduct(String productName, int quantity) {
-        String normalizedStr = normalizeStr(productName);
-        Product product = inventory.get(normalizedStr);
-
-        if (product != null) {
-            // Let the Product handle the math and the thread-safety
-            if (product.tryToSell(quantity)) {
-                System.out.println("Success!");
-            } else {
-                System.out.println("Sale failed: Not enough stock or tried selling 0 units.");
-            }
-        } else {
-            System.out.println("Failed: Product not found.");
+    public void sellProduct(String name, int qty) {
+        Product p = inventory.get(normalizeStr(name));
+        if (p != null && p.tryToSell(qty)) {
+            System.out.println("Sold!");
         }
     }
 
@@ -55,5 +53,6 @@ public class InventoryManager {
         inv.addProduct("iPhone 16", 20);
         inv.addProduct("iPhone 17",13);
         inv.sellProduct("iphone 17", 11);
+        System.out.println(inv.inventory.keySet());
     }
 }

@@ -15,6 +15,7 @@ public class Product {
             int currentAmount = inventoryAmount.get();
 
             if (currentAmount < quantityRequested || quantityRequested  <= 0) {
+                System.out.println("Not enough units or product does not exist.");
                 return false;
             }
             int newAmount = currentAmount - quantityRequested;
@@ -25,8 +26,15 @@ public class Product {
         }
     }
 
-    public void updateStock(int amount) {
+    public void updateStock(int amount, String action) {
         this.inventoryAmount.addAndGet(amount);
+    }
+
+    public void updateStock(int amount, boolean shouldLog, String action) {
+        this.inventoryAmount.addAndGet(amount);
+        if (shouldLog) {
+            Journaler.log(action, this.productName, amount);
+        }
     }
 
     //setters and getters
