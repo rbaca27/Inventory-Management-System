@@ -2,25 +2,26 @@ import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class InventoryManager {
-
     private final HashMap<String, Product> inventory = new HashMap<>();
 
-    private void updateInventory(String action, String productName, int quantity) {
+    //Only call this method alone when recovering inventory. Otherwise, use wrappers bellow.
+    void updateInventory(String action, String productName, int quantity) {
         String normalized = normalizeStr(productName);
 
         if (action.equals("add")) {
             if (inventory.containsKey(normalized)) {
-                inventory.get(normalized).updateStock(quantity, true, action);
+                inventory.get(normalized).updateStock(quantity);
             } else {
                 inventory.put(normalized, new Product(normalized, quantity));
             }
         }
         else if (action.equals("sell")) {
             if (inventory.containsKey(normalized)) {
-                inventory.get(normalized).updateStock(-quantity, true, action);
+                inventory.get(normalized).updateStock(-quantity);
             }
         }
     }
+
     public void addProduct(String name, int qty) {
         Journaler.log("add", name, qty);
         updateInventory("add", name, qty);
