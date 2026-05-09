@@ -2,13 +2,11 @@
 import java.io.*;
 
 public class Journaler {
-
     static BufferedWriter writer;
 
     Journaler(InventoryManager inv){
         Journaler.recover(inv);
         Journaler.initWriter();
-
     }
 
     public static void initWriter() {
@@ -20,6 +18,7 @@ public class Journaler {
             System.exit(1);
         }
     }
+
     public static void recover(InventoryManager inv){
         File journal = new File("journal.txt");
 
@@ -30,8 +29,8 @@ public class Journaler {
         try (BufferedReader reader = new BufferedReader(new FileReader(journal))){
             String line;
             while((line = reader.readLine()) != null){
-
                 if (line.trim().isEmpty()) continue;
+
                 try {
                     String[] actionLine = line.split(",");
                     String action = actionLine[0];
@@ -42,7 +41,6 @@ public class Journaler {
                 } catch (NumberFormatException e) {
                     System.err.println("Possible journal corruption");
                 }
-
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

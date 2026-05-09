@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class InventoryManager {
     private final HashMap<String, Product> inventory = new HashMap<>();
 
-    //Only call this method alone when recovering inventory. Otherwise, use wrappers bellow.
+    //Only call this method alone when recovering inventory. Otherwise, use addProduct or sellProduct.
     void updateInventory(String action, String productName, int quantity) {
         String normalized = normalizeStr(productName);
 
@@ -31,6 +31,8 @@ public class InventoryManager {
         Product p = inventory.get(normalizeStr(name));
         if (p != null && p.tryToSell(qty)) {
             System.out.println("Sold!");
+        }else  {
+            System.out.println("No product found");
         }
     }
 
@@ -48,12 +50,7 @@ public class InventoryManager {
         }
         return product.getInventoryAmount();
     }
-
-    static void main() {
-        InventoryManager inv = new InventoryManager();
-        inv.addProduct("iPhone 16", 20);
-        inv.addProduct("iPhone 17",13);
-        inv.sellProduct("iphone 17", 11);
-        System.out.println(inv.inventory.keySet());
+    public void printProductList(){
+        System.out.println(inventory.keySet());
     }
 }
